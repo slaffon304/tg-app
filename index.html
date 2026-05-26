@@ -174,11 +174,12 @@
                 body: JSON.stringify(data)
             }).then(response => {
                 tg.close();
-            }).catch(error => {
-                alert("Eroare la trimiterea datelor.");
+                        }).catch(error => {
+                alert("Eroare la trimiterea datelor: " + error.message); // Теперь браузер скажет, что именно пошло не так
                 submitBtn.innerText = originalText;
                 submitBtn.style.opacity = '1';
             });
+
         });
     </script>
 </body>
