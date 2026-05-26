@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Настройка Lab Upgrade AI</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 20px;
+            margin: 0;
+        }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, textarea {
+            width: 100%; padding: 10px; margin-top: 5px;
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            border-radius: 8px; box-sizing: border-box;
+            background-color: var(--tg-theme-secondary-bg-color, #f4f4f5);
+            color: var(--tg-theme-text-color, #000000);
+        }
+        textarea { height: 100px; resize: vertical; }
+        button {
+            width: 100%; padding: 15px; margin-top: 25px;
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none; border-radius: 8px; font-size: 16px; font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Детали вашего бизнеса</h2>
+    <p>Заполните данные, чтобы ИИ мог начать работу.</p>
+
+    <form id="businessForm">
+        <label>Телефон pentru contact:</label>
+        <input type="tel" id="client_phone" required placeholder="+373...">
+
+        <label>Email (Gmail) pentru Google Calendar:</label>
+        <input type="email" id="gmail" required placeholder="exemplu@gmail.com">
+
+        <label>Nișa afacerii (ex: Salon de frumusețe, Auto):</label>
+        <input type="text" id="business_niche" required>
+
+        <label>Detalii despre servicii, prețuri și reguli (Context):</label>
+        <textarea id="business_context" required placeholder="Descrieți serviciile..."></textarea>
+
+        <label>Username-ul grupului/chat-ului pentru notificări (ex: @grupul_meu):</label>
+        <input type="text" id="tg_chat_id_notify" required>
+
+        <button type="submit">Salvează și Continuă</button>
+    </form>
+
+    <script>
+        // Инициализируем Telegram Web App
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Разворачиваем на весь экран
+
+        document.getElementById('businessForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Собираем данные
+            const data = {
+                telegram_id: tg.initDataUnsafe?.user?.id, // Natively получаем ID из ТГ
+                client_phone: document.getElementById('client_phone').value,
+                gmail: document.getElementById('gmail').value,
+                business_niche: document.getElementById('business_niche').value,
+                business_context: document.getElementById('business_context').value,
+                tg_chat_id_notify: document.getElementById('tg_chat_id_notify').value
+            };
+
+            // Отправляем в n8n
+            fetch('https://n8n.labupgrade.in/webhook/data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(response => {
+                tg.close(); // Закрываем окошко после успешной отправки
+            }).catch(error => {
+                alert("Eroare la trimiterea datelor.");
+            });
+        });
+    </script>
+</body>
+</html>
