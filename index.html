@@ -1,71 +1,166 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ro">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Настройка Lab Upgrade AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Setări Lab Upgrade AI</title>
+    <!-- Подключаем скрипт Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Подключаем современный шрифт -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Базовые переменные с фолбеком на стильный светлый дизайн, если открыто не в ТГ */
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #f3f4f6);
+            --text-color: var(--tg-theme-text-color, #111827);
+            --hint-color: var(--tg-theme-hint-color, #6b7280);
+            --button-color: var(--tg-theme-button-color, #2563eb);
+            --button-text: var(--tg-theme-button-text-color, #ffffff);
+            --input-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --border-color: #d1d5db;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             margin: 0;
+            padding: 24px 20px;
+            -webkit-font-smoothing: antialiased;
         }
-        label { display: block; margin-top: 15px; font-weight: bold; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header h2 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--hint-color);
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
         input, textarea {
-            width: 100%; padding: 10px; margin-top: 5px;
-            border: 1px solid var(--tg-theme-hint-color, #ccc);
-            border-radius: 8px; box-sizing: border-box;
-            background-color: var(--tg-theme-secondary-bg-color, #f4f4f5);
-            color: var(--tg-theme-text-color, #000000);
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-sizing: border-box;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            outline: none;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        textarea { height: 100px; resize: vertical; }
+
+        input:focus, textarea:focus {
+            border-color: var(--button-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+            line-height: 1.5;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #9ca3af;
+        }
+
         button {
-            width: 100%; padding: 15px; margin-top: 25px;
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none; border-radius: 8px; font-size: 16px; font-weight: bold;
+            width: 100%;
+            padding: 16px;
+            margin-top: 12px;
+            background-color: var(--button-color);
+            color: var(--button-text);
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        button:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 4px -1px rgba(37, 99, 235, 0.2);
         }
     </style>
 </head>
 <body>
 
-    <h2>Детали вашего бизнеса</h2>
-    <p>Заполните данные, чтобы ИИ мог начать работу.</p>
+    <div class="header">
+        <h2>Setări Lab Upgrade</h2>
+        <p>Configurați asistentul AI cu detaliile afacerii dvs. pentru a începe generarea vânzărilor.</p>
+    </div>
 
     <form id="businessForm">
-        <label>Телефон pentru contact:</label>
-        <input type="tel" id="client_phone" required placeholder="+373...">
+        <div class="form-group">
+            <label>Telefon de contact</label>
+            <input type="tel" id="client_phone" required placeholder="+373 69 000 000">
+        </div>
 
-        <label>Email (Gmail) pentru Google Calendar:</label>
-        <input type="email" id="gmail" required placeholder="exemplu@gmail.com">
+        <div class="form-group">
+            <label>Email (Google Calendar)</label>
+            <input type="email" id="gmail" required placeholder="exemplu@gmail.com">
+        </div>
 
-        <label>Nișa afacerii (ex: Salon de frumusețe, Auto):</label>
-        <input type="text" id="business_niche" required>
+        <div class="form-group">
+            <label>Nișa afacerii</label>
+            <input type="text" id="business_niche" required placeholder="ex: Salon de frumusețe, Service Auto">
+        </div>
 
-        <label>Detalii despre servicii, prețuri și reguli (Context):</label>
-        <textarea id="business_context" required placeholder="Descrieți serviciile..."></textarea>
+        <div class="form-group">
+            <label>Context, servicii și prețuri</label>
+            <textarea id="business_context" required placeholder="Descrieți pe scurt serviciile oferite, prețurile și orice reguli specifice de care AI-ul ar trebui să țină cont..."></textarea>
+        </div>
 
-        <label>Username-ul grupului/chat-ului pentru notificări (ex: @grupul_meu):</label>
-        <input type="text" id="tg_chat_id_notify" required>
+        <div class="form-group">
+            <label>Grup de notificări (Telegram)</label>
+            <input type="text" id="tg_chat_id_notify" required placeholder="@grupul_meu_notificari">
+        </div>
 
-        <button type="submit">Salvează și Continuă</button>
+        <button type="submit">Salvează și Activează AI</button>
     </form>
 
     <script>
-        // Инициализируем Telegram Web App
         const tg = window.Telegram.WebApp;
-        tg.expand(); // Разворачиваем на весь экран
+        tg.expand();
 
         document.getElementById('businessForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
-            // Собираем данные
+            const submitBtn = document.querySelector('button');
+            const originalText = submitBtn.innerText;
+            submitBtn.innerText = 'Se salvează...';
+            submitBtn.style.opacity = '0.8';
+
             const data = {
-                telegram_id: tg.initDataUnsafe?.user?.id, // Natively получаем ID из ТГ
+                telegram_id: tg.initDataUnsafe?.user?.id,
                 client_phone: document.getElementById('client_phone').value,
                 gmail: document.getElementById('gmail').value,
                 business_niche: document.getElementById('business_niche').value,
@@ -73,15 +168,16 @@
                 tg_chat_id_notify: document.getElementById('tg_chat_id_notify').value
             };
 
-            // Отправляем в n8n
             fetch('https://n8n.labupgrade.in/webhook/data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             }).then(response => {
-                tg.close(); // Закрываем окошко после успешной отправки
+                tg.close();
             }).catch(error => {
                 alert("Eroare la trimiterea datelor.");
+                submitBtn.innerText = originalText;
+                submitBtn.style.opacity = '1';
             });
         });
     </script>
