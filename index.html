@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Setări Lab Upgrade AI</title>
-    <!-- Подключаем скрипт Telegram -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <!-- Подключаем современный шрифт -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Базовые переменные с фолбеком на стильный светлый дизайн, если открыто не в ТГ */
         :root {
             --bg-color: var(--tg-theme-bg-color, #f3f4f6);
             --text-color: var(--tg-theme-text-color, #111827);
@@ -60,7 +57,7 @@
             color: var(--text-color);
         }
 
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             padding: 14px 16px;
             font-size: 15px;
@@ -75,7 +72,17 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        input:focus, textarea:focus {
+        /* Кастомная стрелочка для select */
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b7280%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px top 50%;
+            background-size: 12px auto;
+            padding-right: 40px;
+        }
+
+        input:focus, textarea:focus, select:focus {
             border-color: var(--button-color);
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
@@ -120,6 +127,18 @@
 
     <form id="businessForm">
         <div class="form-group">
+            <label>Selectați Proiectul</label>
+            <select id="project_select" onchange="toggleNewProjectInput()" required>
+                <option value="" disabled selected>Se încarcă proiectele...</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="new_project_group" style="display: none;">
+            <label>Numele noului proiect</label>
+            <input type="text" id="new_project_name" placeholder="ex: Lab Upgrade">
+        </div>
+
+        <div class="form-group">
             <label>Telefon de contact</label>
             <input type="tel" id="client_phone" required placeholder="+373 69 000 000">
         </div>
@@ -150,7 +169,49 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
+        
+        // Получаем ID пользователя из Telegram
+        const userTgId = tg.initDataUnsafe?.user?.id;
 
+        // 1. Загрузка списка проектов с защищенного вебхука n8n
+        async function loadProjects() {
+            const select = document.getElementById('project_select');
+            try {
+                // Запрос к вебхуку "Mini App - Get Projects"
+                const response = await fetch(`https://n8n.labupgrade.in/webhook/get-projects?tg_id=${userTgId}`);
+                const projects = await response.json();
+
+                select.innerHTML = '<option value="" disabled selected>Alegeți proiectul</option>';
+                
+                if (Array.isArray(projects) && projects.length > 0 && projects[0].project_name) {
+                    projects.forEach(p => {
+                        select.innerHTML += `<option value="${p.id}">${p.project_name}</option>`;
+                    });
+                }
+                // Всегда добавляем кнопку создания нового проекта в конец списка
+                select.innerHTML += '<option value="new">➕ Crează proiect nou</option>';
+            } catch (err) {
+                // Если произошла ошибка сети или проектов нет, даем возможность создать новый
+                select.innerHTML = '<option value="" disabled selected>Alegeți proiectul</option><option value="new">➕ Crează proiect nou</option>';
+            }
+        }
+
+        // 2. Логика скрытия/показа поля для ввода названия нового проекта
+        function toggleNewProjectInput() {
+            const select = document.getElementById('project_select');
+            const newProjectGroup = document.getElementById('new_project_group');
+            const newProjectInput = document.getElementById('new_project_name');
+            
+            if (select.value === 'new') {
+                newProjectGroup.style.display = 'block';
+                newProjectInput.required = true;
+            } else {
+                newProjectGroup.style.display = 'none';
+                newProjectInput.required = false;
+            }
+        }
+
+        // 3. Сбор и отправка данных формы
         document.getElementById('businessForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -159,13 +220,21 @@
             submitBtn.innerText = 'Se salvează...';
             submitBtn.style.opacity = '0.8';
 
+            const selectValue = document.getElementById('project_select').value;
+
+            // Формируем payload для отправки в n8n (вебхук Another client data)
             const data = {
-                telegram_id: tg.initDataUnsafe?.user?.id,
+                telegram_id: userTgId,
                 client_phone: document.getElementById('client_phone').value,
                 gmail: document.getElementById('gmail').value,
                 business_niche: document.getElementById('business_niche').value,
                 business_context: document.getElementById('business_context').value,
-                tg_chat_id_notify: document.getElementById('tg_chat_id_notify').value
+                tg_chat_id_notify: document.getElementById('tg_chat_id_notify').value,
+                
+                // Параметры для маршрутизации внутри n8n (создать новый или обновить старый)
+                action: selectValue === 'new' ? 'create' : 'update',
+                project_id: selectValue === 'new' ? null : selectValue,
+                company_name: selectValue === 'new' ? document.getElementById('new_project_name').value : null
             };
 
             fetch('https://n8n.labupgrade.in/webhook/data', {
@@ -174,13 +243,15 @@
                 body: JSON.stringify(data)
             }).then(response => {
                 tg.close();
-                        }).catch(error => {
-                alert("Eroare la trimiterea datelor: " + error.message); // Теперь браузер скажет, что именно пошло не так
+            }).catch(error => {
+                alert("Eroare la trimiterea datelor: " + error.message);
                 submitBtn.innerText = originalText;
                 submitBtn.style.opacity = '1';
             });
-
         });
+
+        // Инициализируем загрузку при открытии Mini App
+        loadProjects();
     </script>
 </body>
 </html>
