@@ -87,8 +87,8 @@
         }
 
         textarea {
-            height: 120px;
-            resize: none;
+            min-height: 160px; /* Увеличенная базовая высота */
+            resize: vertical;  /* Позволяет пользователю тянуть поле вниз */
             line-height: 1.5;
         }
 
@@ -165,28 +165,27 @@
         tg.expand();
         
         const userTgId = tg.initDataUnsafe?.user?.id;
-
-        // ВЫТАСКИВАЕМ ПАРАМЕТР ИЗ URL (для тестов от лица админа)
         const urlParams = new URLSearchParams(window.location.search);
         const adminClientId = urlParams.get('state'); 
+
+        // Глобальная переменная для хранения скачанных проектов
+        let allProjects = [];
 
         async function loadProjects() {
             const select = document.getElementById('project_select');
             try {
-                // Если есть state (adminClientId), отправляем его как client_id. 
-                // Если его нет, отправляем обычный tg_id клиента.
                 let fetchUrl = `https://n8n.labupgrade.in/webhook/get-projects?tg_id=${userTgId}`;
                 if (adminClientId) {
                     fetchUrl = `https://n8n.labupgrade.in/webhook/get-projects?client_id=${adminClientId}`;
                 }
 
                 const response = await fetch(fetchUrl);
-                const projects = await response.json();
+                allProjects = await response.json(); // Сохраняем все данные в переменную
 
                 select.innerHTML = '<option value="" disabled selected>Alegeți proiectul</option>';
                 
-                if (Array.isArray(projects) && projects.length > 0 && projects[0].project_name) {
-                    projects.forEach(p => {
+                if (Array.isArray(allProjects) && allProjects.length > 0 && allProjects[0].project_name) {
+                    allProjects.forEach(p => {
                         select.innerHTML += `<option value="${p.id}">${p.project_name}</option>`;
                     });
                 }
@@ -194,6 +193,22 @@
                 select.innerHTML = '<option value="" disabled selected>Alegeți proiectul</option>';
             }
         }
+
+        // Слушаем переключение проектов в выпадающем списке
+        document.getElementById('project_select').addEventListener('change', function(e) {
+            const selectedId = e.target.value;
+            // Ищем выбранный проект в сохраненном массиве
+            const currentProject = allProjects.find(p => p.id === selectedId);
+            
+            if (currentProject) {
+                // Подставляем значения, если они есть. Если пусто (null), оставляем пустую строку
+                document.getElementById('client_phone').value = currentProject.client_phone || '';
+                document.getElementById('gmail').value = currentProject.gmail || '';
+                document.getElementById('business_niche').value = currentProject.business_niche || '';
+                document.getElementById('business_context').value = currentProject.business_context || '';
+                document.getElementById('tg_chat_id_notify').value = currentProject.tg_chat_id_notify || '';
+            }
+        });
 
         document.getElementById('businessForm').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -205,7 +220,7 @@
 
             const data = {
                 telegram_id: userTgId,
-                client_id: adminClientId || null, // Отправляем ID клиента, если зашли через админку
+                client_id: adminClientId || null,
                 client_phone: document.getElementById('client_phone').value,
                 gmail: document.getElementById('gmail').value,
                 business_niche: document.getElementById('business_niche').value,
