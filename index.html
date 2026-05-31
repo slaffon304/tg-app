@@ -148,6 +148,11 @@
         </div>
 
         <div class="form-group">
+            </label>Scopul AI-ui</label>
+            <textarea id="bot_goal" required placeholder="Descrieți destinatia Ai-ui in forma liberă: consultare, vinzările, booking "></textarea>
+        </div>
+
+        <div class="form-group">
             <label>Context, servicii și prețuri</label>
             <textarea id="business_context" required placeholder="Descrieți detaliat serviciile oferite, prețurile și orice reguli specifice de care AI-ul ar trebui să țină cont..."></textarea>
         </div>
@@ -224,6 +229,7 @@
                 client_phone: document.getElementById('client_phone').value,
                 gmail: document.getElementById('gmail').value,
                 business_niche: document.getElementById('business_niche').value,
+                bot_goal: document.getElementById('bot_goal').value,
                 business_context: document.getElementById('business_context').value,
                 tg_chat_id_notify: document.getElementById('tg_chat_id_notify').value,
                 action: 'update',
