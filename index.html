@@ -86,11 +86,15 @@
             box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
         }
 
-        textarea {
-            min-height: 160px; /* Увеличенная базовая высота */
-            resize: vertical;  /* Позволяет пользователю тянуть поле вниз */
+                textarea {
+            min-height: 160px;
+            resize: vertical;
             line-height: 1.5;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 0L0 10H10V0Z' fill='%239ca3af'/%3E%3Cpath d='M10 4L4 10H10V4Z' fill='%239ca3af'/%3E%3Cpath d='M10 8L8 10H10V8Z' fill='%239ca3af'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: bottom 8px right 8px;
         }
+
 
         input::placeholder, textarea::placeholder {
             color: #9ca3af;
